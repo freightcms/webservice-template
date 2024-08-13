@@ -9,7 +9,10 @@ A prototype building out with GraphQL, Golang, and MongoDB
 ```txt
 go 1.22.5
 
-use ./web
+use (
+    .
+    ./web
+)
 ```
 
 ## Running

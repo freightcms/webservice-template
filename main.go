@@ -35,8 +35,13 @@ func main() {
 		return
 	}
 
+	rootSchema, err := web.NewSchema()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 	h := handler.New(&handler.Config{
-		Schema:   &web.RootSchema,
+		Schema:   &rootSchema,
 		Pretty:   true,
 		GraphiQL: true,
 	})
