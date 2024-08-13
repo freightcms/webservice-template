@@ -30,11 +30,14 @@ func main() {
 	}
 
 	defer client.Disconnect(ctx)
+	fmt.Println("Pinging server...")
 	if err := client.Ping(ctx, nil); err != nil {
 		log.Fatal(err)
 		return
 	}
 
+	fmt.Println("Done")
+	fmt.Println("Setting up handlers and routes")
 	rootSchema, err := web.NewSchema()
 	if err != nil {
 		log.Fatal(err)
@@ -64,6 +67,7 @@ func main() {
 		w.Write([]byte("{\"status\":\"ok\"}"))
 		w.Header().Set("ContentType", "application/json")
 	})
-
+	fmt.Println("Done")
+	fmt.Println("Start server at http://localhost:8080")
 	http.ListenAndServe(":8080", server)
 }

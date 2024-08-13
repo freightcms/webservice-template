@@ -15,6 +15,12 @@ use (
 )
 ```
 
+### .env file
+
+```dotenv
+MONGO_SERVER=mongodb://root:example@0.0.0.0:27017/
+```
+
 ## Running
 
 From the root of the application...
@@ -35,4 +41,10 @@ go run main.go
 
 ```sh
 curl http://localhost:8080/
+```
+
+should output
+
+```sh
+{ "status": "ok" }
 ```
