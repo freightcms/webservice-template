@@ -4,10 +4,8 @@ import (
 	"errors"
 
 	"github.com/graphql-go/graphql"
+	"github.com/squishedfox/webservice-prototype/db/mongodb"
 	"github.com/squishedfox/webservice-prototype/models"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -26,34 +24,21 @@ var (
 					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					session := mongo.SessionFromContext(params.Context)
-					if session == nil {
-						return nil, errors.New("failed to fetch session from context")
-					}
-					createPersonModel := struct {
-						FirstName string `json:"firstName" bson:"firstName"`
-						LastName  string `json:"lastName" bson:"lastName"`
-					}{
+					model := models.Person{
 						FirstName: params.Args["firstName"].(string),
 						LastName:  params.Args["lastName"].(string),
 					}
-					coll := session.Client().Database("graphql_mongo_prototype").Collection("people")
-					insertedResult, err := coll.InsertOne(
-						params.Context,
-						&createPersonModel,
-						options.InsertOne(),
-					)
+
+					mgr, ok := mongodb.FromContext(params.Context)
+					if !ok {
+						return nil, errors.New("Could not fetch resource manager from context")
+					}
+
+					id, err := mgr.CreatePerson(model)
 					if err != nil {
 						return nil, err
 					}
-
-					var result models.Person
-					filter := bson.M{"_id": insertedResult.InsertedID}
-					if err := coll.FindOne(params.Context, filter).Decode(&result); err != nil {
-						return nil, err
-					}
-
-					return result, nil
+					return id, err
 				},
 			},
 		},

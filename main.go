@@ -10,6 +10,7 @@ import (
 
 	dotenv "github.com/dotenv-org/godotenvvault"
 	"github.com/graphql-go/handler"
+	"github.com/squishedfox/webservice-prototype/db/mongodb"
 	"github.com/squishedfox/webservice-prototype/web"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -67,7 +68,12 @@ func main() {
 			return
 		}
 		defer session.EndSession(r.Context())
-		h.ServeHTTP(w, r.WithContext(mongo.NewSessionContext(r.Context(), session)))
+
+		sessionContext := mongo.NewSessionContext(r.Context(), session)
+		personManager := mongodb.NewPersonManager(sessionContext.(mongo.SessionContext))
+		newRequestCtx := context.WithValue(sessionContext, mongodb.ContextKey, &personManager)
+
+		h.ServeHTTP(w, r.WithContext(newRequestCtx))
 	})
 
 	server.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
