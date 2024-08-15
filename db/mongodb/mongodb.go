@@ -1,7 +1,7 @@
 package mongodb
 
 import (
-	"ggithub.com/squishedfox/webservice-prototype/db"
+	"github.com/squishedfox/webservice-prototype/db"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
