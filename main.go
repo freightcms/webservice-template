@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,6 +16,8 @@ import (
 )
 
 func main() {
+	port := flag.Int("p", 8080, "Port to run application on")
+	host := flag.String("h", "0.0.0.0", "Host address to run application on")
 	ctx := context.Background()
 	fmt.Println("Starting application...")
 	if err := dotenv.Load(".env"); err != nil {
@@ -69,5 +72,5 @@ func main() {
 	})
 	fmt.Println("Done")
 	fmt.Println("Start server at http://localhost:8080")
-	http.ListenAndServe(":8080", server)
+	http.ListenAndServe(fmt.Sprintf("%v:%d", host, port), server)
 }
