@@ -1,3 +1,3 @@
-module github.com/squishedfox/webservice-protype/models
+module github.com/squishedfox/webservice-prototype/models
 
 go 1.22.5
