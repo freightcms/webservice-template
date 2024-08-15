@@ -12,6 +12,7 @@ go 1.22.5
 use (
     .
     ./db
+    ./db/mongodb
     ./models
     ./web
 )
@@ -32,14 +33,19 @@ From the root of the application...
 ```sh
 docker compose up -d
 ```
+2. Make sure to install all dependencies
 
-2. Start the main application
+```sh
+go get
+```
+
+3. Start the main application
 
 ```sh
 go run main.go
 ```
 
-3. test the application is up and healthy
+4. test the application is up and healthy
 
 ```sh
 curl http://localhost:8080/
