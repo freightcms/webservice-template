@@ -70,10 +70,9 @@ func main() {
 		defer session.EndSession(r.Context())
 
 		sessionContext := mongo.NewSessionContext(r.Context(), session)
-		personManager := mongodb.NewPersonManager(sessionContext.(mongo.SessionContext))
-		newRequestCtx := context.WithValue(sessionContext, mongodb.ContextKey, &personManager)
+		personManagerContext := mongodb.WithContext(sessionContext)
 
-		h.ServeHTTP(w, r.WithContext(newRequestCtx))
+		h.ServeHTTP(w, r.WithContext(personManagerContext))
 	})
 
 	server.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

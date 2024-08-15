@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/squishedfox/webservice-prototype/db"
@@ -46,14 +47,26 @@ func (r *resourceManager) Get() ([]*models.Person, error) {
 // ,appends the person manager and returns all with the new context.
 func WithContext(parent context.Context) context.Context {
 	session := mongo.SessionFromContext(parent)
-	mgr := NewPersonManager(session.(mongo.SessionContext))
+	if session == nil {
+		panic("Could not fetch session from context")
+	}
+	mgr := NewPersonManager(parent.(mongo.SessionContext))
 	return context.WithValue(parent, ContextKey, &mgr)
 }
 
 // FromContext gets the Resource Manager from the context passsed.
-func FromContext(ctx context.Context) (db.PersonResourceManager, bool) {
-	mgr, ok := ctx.Value(ContextKey).(*resourceManager)
-	return mgr, ok
+func FromContext(ctx context.Context) db.PersonResourceManager {
+	val := ctx.Value(ContextKey)
+	if val == nil {
+		panic(errors.New("Could not fetch PersonResourceManager from context"))
+	}
+
+	mgr, ok := val.(resourceManager)
+	if !ok {
+		panic(errors.New("Could not fetch PersonResourceManager from context"))
+	}
+
+	return &mgr
 }
 
 // CreatePerson implements db.PersonResourceManager.

@@ -1,8 +1,6 @@
 package web
 
 import (
-	"errors"
-
 	"github.com/graphql-go/graphql"
 	"github.com/squishedfox/webservice-prototype/db/mongodb"
 	"github.com/squishedfox/webservice-prototype/models"
@@ -29,11 +27,7 @@ var (
 						LastName:  params.Args["lastName"].(string),
 					}
 
-					mgr, ok := mongodb.FromContext(params.Context)
-					if !ok {
-						return nil, errors.New("Could not fetch resource manager from context")
-					}
-
+					mgr := mongodb.FromContext(params.Context)
 					id, err := mgr.CreatePerson(model)
 					if err != nil {
 						return nil, err
