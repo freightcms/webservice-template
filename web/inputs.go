@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/graphql-go/graphql"
+	"github.com/squishedfox/webservice-prototype/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -45,12 +46,8 @@ var (
 					if err != nil {
 						return nil, err
 					}
-					var result struct {
-						ID        string `json:"id" bson:"_id"`
-						FirstName string `json:"firstName" bson:"firstName"`
-						LastName  string `json:"lastName" bson:"lastName"`
-					}
 
+					var result models.Person
 					filter := bson.M{"_id": insertedResult.InsertedID}
 					if err := coll.FindOne(params.Context, filter).Decode(&result); err != nil {
 						return nil, err
