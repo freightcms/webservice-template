@@ -15,9 +15,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var (
+	port int
+	host string
+)
+
 func main() {
-	port := flag.Int("p", 8080, "Port to run application on")
-	host := flag.String("h", "0.0.0.0", "Host address to run application on")
+	flag.IntVar(&port, "p", 8080, "Port to run application on")
+	flag.StringVar(&host, "h", "0.0.0.0", "Host address to run application on")
 	ctx := context.Background()
 	fmt.Println("Starting application...")
 	if err := dotenv.Load(".env"); err != nil {
@@ -71,6 +76,7 @@ func main() {
 		w.Header().Set("ContentType", "application/json")
 	})
 	fmt.Println("Done")
-	fmt.Println("Start server at http://localhost:8080")
-	http.ListenAndServe(fmt.Sprintf("%v:%d", host, port), server)
+	hostname := fmt.Sprintf("%v:%d", host, port)
+	fmt.Printf("Start server at %s", hostname)
+	http.ListenAndServe(hostname, server)
 }
