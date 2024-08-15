@@ -11,6 +11,8 @@ go 1.22.5
 
 use (
     .
+    ./db
+    ./models
     ./web
 )
 ```
