@@ -11,7 +11,7 @@ var (
 		Name: "mutations",
 		Fields: graphql.Fields{
 			"createPerson": &graphql.Field{
-				Type:        PersonObject,
+				Type:        IDObject,
 				Description: "Create new Person",
 				Args: graphql.FieldConfigArgument{
 					"firstName": &graphql.ArgumentConfig{
@@ -34,6 +34,20 @@ var (
 					}
 					return id, err
 				},
+			},
+			"deletePerson": &graphql.Field {
+				Type: EmptyObject,	
+				Description: "Delete an existing Person resource",
+				Args: graphql.FieldConfigArgument {
+					"id": &graphql.ArgumentConfig {
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					mgr := mongodb.FromContext(params.Context)
+					err := mgr.Delete(params.Args["id"].(string))
+					return struct{}{}, err
+				}
 			},
 		},
 	})

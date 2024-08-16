@@ -84,7 +84,9 @@ func (r *resourceManager) CreatePerson(person models.Person) (interface{}, error
 
 // DeletePerson implements db.PersonResourceManager.
 func (r *resourceManager) DeletePerson(id interface{}) error {
-	panic("unimplemented")
+	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
+	_, err := coll.DeleteOne(r.session, bson.M{"_id": id})
+	return err
 }
 
 // GetById implements db.PersonResourceManager.
