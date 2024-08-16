@@ -45,28 +45,22 @@ func (r *resourceManager) Get() ([]*models.Person, error) {
 
 // WithContext fetches the mongo db session context from that passed argument (parent context)
 // ,appends the person manager and returns all with the new context.
-func WithContext(parent context.Context) context.Context {
-	session := mongo.SessionFromContext(parent)
+func WithContext(session mongo.SessionContext) context.Context {
 	if session == nil {
 		panic("Could not fetch session from context")
 	}
-	mgr := NewPersonManager(parent.(mongo.SessionContext))
-	return context.WithValue(parent, ContextKey, &mgr)
+	mgr := NewPersonManager(session)
+	return context.WithValue(session, ContextKey, mgr)
 }
 
 // FromContext gets the Resource Manager from the context passsed.
 func FromContext(ctx context.Context) db.PersonResourceManager {
 	val := ctx.Value(ContextKey)
 	if val == nil {
-		panic(errors.New("Could not fetch PersonResourceManager from context"))
+		panic(errors.New("could not fetch PersonResourceManager from context"))
 	}
 
-	mgr, ok := val.(resourceManager)
-	if !ok {
-		panic(errors.New("Could not fetch PersonResourceManager from context"))
-	}
-
-	return &mgr
+	return val.(*resourceManager)
 }
 
 // CreatePerson implements db.PersonResourceManager.
@@ -102,7 +96,13 @@ func (r *resourceManager) GetById(id interface{}) (*models.Person, error) {
 
 // UpdatePerson implements db.PersonResourceManager.
 func (r *resourceManager) UpdatePerson(id interface{}, person models.Person) error {
-	panic("unimplemented")
+	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
+	result, err := coll.UpdateOne(r.session, bson.M{"_id": id}, person)
+
+	if result.MatchedCount == 0 {
+		return errors.New(fmt.Sprintf("Could not find Person with id %s", id))
+	}
+	return err
 }
 
 func NewPersonManager(session mongo.SessionContext) db.PersonResourceManager {

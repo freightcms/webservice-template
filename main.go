@@ -26,6 +26,7 @@ func main() {
 	flag.StringVar(&host, "h", "0.0.0.0", "Host address to run application on")
 	ctx := context.Background()
 	fmt.Println("Starting application...")
+
 	if err := dotenv.Load(".env"); err != nil {
 		log.Fatal(err)
 		return
@@ -40,13 +41,14 @@ func main() {
 
 	defer client.Disconnect(ctx)
 	fmt.Println("Pinging server...")
-	if err := client.Ping(ctx, nil); err != nil {
+	if err = client.Ping(ctx, nil); err != nil {
 		log.Fatal(err)
 		return
 	}
 
 	fmt.Println("Done")
 	fmt.Println("Setting up handlers and routes")
+
 	rootSchema, err := web.NewSchema()
 	if err != nil {
 		log.Fatal(err)
@@ -71,8 +73,8 @@ func main() {
 
 		sessionContext := mongo.NewSessionContext(r.Context(), session)
 		personManagerContext := mongodb.WithContext(sessionContext)
-
-		h.ServeHTTP(w, r.WithContext(personManagerContext))
+		ctx := r.WithContext(personManagerContext)
+		h.ServeHTTP(w, ctx)
 	})
 
 	server.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
