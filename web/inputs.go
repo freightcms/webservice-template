@@ -48,7 +48,7 @@ var (
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					mgr := mongodb.FromContext(params.Context)
 					err := mgr.DeletePerson(params.Args["id"].(string))
-					return struct{}{}, err
+					return true, err
 				},
 			},
 			"updatePerson": &graphql.Field{

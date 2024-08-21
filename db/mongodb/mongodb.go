@@ -24,9 +24,21 @@ type resourceManager struct {
 }
 
 // Get implements db.PersonResourceManager.
-func (r *resourceManager) Get() ([]*models.Person, error) {
+func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
-	cursor, err := coll.Find(r.session, bson.D{}, nil)
+
+	skip := int64((query.Page - 1) * query.PageSize)
+	ps := int64(query.PageSize)
+	filter := bson.D{}
+	tmp := bson.E{}
+	tmp[query.SortBy] = 1
+
+	filter = append(filter, tmp)
+	cursor, err := coll.Find(r.session, bson.D{}, &options.FindOptions{
+		Limit: &ps,
+		Skip:  &skip,
+		Sort:  filter,
+	})
 	if err != nil {
 		return nil, err
 	}
