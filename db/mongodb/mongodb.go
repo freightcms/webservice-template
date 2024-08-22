@@ -27,18 +27,17 @@ type resourceManager struct {
 func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
 
-	skip := int64((query.Page - 1) * query.PageSize)
-	ps := int64(query.PageSize)
-	filter := bson.D{}
-	tmp := bson.E{}
-	tmp[query.SortBy] = 1
+	projection := bson.D{}
 
-	filter = append(filter, tmp)
-	cursor, err := coll.Find(r.session, bson.D{}, &options.FindOptions{
-		Limit: &ps,
-		Skip:  &skip,
-		Sort:  filter,
-	})
+	// see https://www.mongodb.com/docs/drivers/go/current/fundamentals/crud/read-operations/project/
+	for _, fieldName := range query.Fields {
+		projection = append(projection, bson.E{
+			Key:   fieldName,
+			Value: 1,
+		})
+	}
+	opts := options.Find().SetSort(bson.D{bson.E{Key: query.SortBy, Value: 1}}).SetLimit(int64(query.PageSize)).SetSkip(int64((query.Page - 1) * query.PageSize)).SetProjection(projection)
+	cursor, err := coll.Find(r.session, bson.D{}, opts)
 	if err != nil {
 		return nil, err
 	}

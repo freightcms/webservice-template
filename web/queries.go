@@ -31,7 +31,7 @@ var (
 								},
 							},
 						}),
-						DefaultValue: "id",
+						DefaultValue: "_id",
 					},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
