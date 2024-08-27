@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/squishedfox/webservice-prototype/db"
 	"github.com/squishedfox/webservice-prototype/models"
@@ -31,12 +32,21 @@ func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 
 	// see https://www.mongodb.com/docs/drivers/go/current/fundamentals/crud/read-operations/project/
 	for _, fieldName := range query.Fields {
-		projection = append(projection, bson.E{
-			Key:   fieldName,
-			Value: 1,
-		})
+		// for security reasons we only want people to be able to query the objects that they should be able to
+		if slices.Contains([]string{"id", "firstName", "lastName"}, fieldName) {
+			projection = append(projection, bson.E{
+				Key:   fieldName,
+				Value: 1,
+			})
+		}
 	}
-	opts := options.Find().SetSort(bson.D{bson.E{Key: query.SortBy, Value: 1}}).SetLimit(int64(query.PageSize)).SetSkip(int64((query.Page - 1) * query.PageSize)).SetProjection(projection)
+	if len(query.SortBy) != 0 {
+		if !slices.Contains([]string{"id"}, query.SortBy) {
+			return nil, errors.New("not a valid query parameter")
+		}
+	}
+	sort := bson.D{bson.E{Key: query.SortBy, Value: 1}}
+	opts := options.Find().SetSort(sort).SetLimit(int64(query.PageSize)).SetSkip(int64((query.Page - 1) * query.PageSize)).SetProjection(projection)
 	cursor, err := coll.Find(r.session, bson.D{}, opts)
 	if err != nil {
 		return nil, err
