@@ -121,7 +121,7 @@ func (r *resourceManager) UpdatePerson(id interface{}, person models.Person) err
 	result, err := coll.UpdateOne(r.session, bson.M{"_id": id}, person)
 
 	if result.MatchedCount == 0 {
-		return errors.New(fmt.Sprintf("Could not find Person with id %s", id))
+		return fmt.Errorf("could not find Person with id %s", id)
 	}
 	return err
 }
