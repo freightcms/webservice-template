@@ -41,12 +41,17 @@ func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 		}
 	}
 	if len(query.SortBy) != 0 {
-		if !slices.Contains([]string{"id"}, query.SortBy) {
-			return nil, errors.New("not a valid query parameter")
+		if !slices.Contains([]string{"_id", "id"}, query.SortBy) {
+			return nil, fmt.Errorf("%s is not a valid sortBy option", query.SortBy)
 		}
 	}
 	sort := bson.D{bson.E{Key: query.SortBy, Value: 1}}
-	opts := options.Find().SetSort(sort).SetLimit(int64(query.PageSize)).SetSkip(int64((query.Page - 1) * query.PageSize)).SetProjection(projection)
+	opts := options.Find().
+		SetSort(sort).
+		SetLimit(int64(query.PageSize)).
+		SetSkip(int64((query.Page) * query.PageSize)).
+		SetProjection(projection)
+
 	cursor, err := coll.Find(r.session, bson.D{}, opts)
 	if err != nil {
 		return nil, err

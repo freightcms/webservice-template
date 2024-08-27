@@ -15,7 +15,7 @@ var (
 				Args: graphql.FieldConfigArgument{
 					"page": &graphql.ArgumentConfig{
 						Type:         graphql.Int,
-						DefaultValue: 1,
+						DefaultValue: 0,
 					},
 					"pageSize": &graphql.ArgumentConfig{
 						Type:         graphql.Int,
