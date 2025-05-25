@@ -3,7 +3,8 @@ module github.com/freightcms/webservice-template/db/mongodb
 go 1.24.3
 
 require (
-	github.com/squishedfox/webservice-prototype v0.0.0-20250312022857-082b54356419
+	github.com/freightcms/webservice-template/db v0.0.0-00010101000000-000000000000
+	github.com/freightcms/webservice-template/models v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver v1.17.3
 )
 
@@ -20,6 +21,6 @@ require (
 	golang.org/x/text v0.17.0 // indirect
 )
 
-replace github.com/freightcms/webservice-template/db => ../db
+replace github.com/freightcms/webservice-template/db => ../
 
-replace github.com/freightcms/webservice-template/models => ../models
+replace github.com/freightcms/webservice-template/models => ../../models

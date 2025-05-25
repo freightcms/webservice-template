@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/freightcms/webservce-template/db"
 	"github.com/labstack/echo/v4"
 )
 

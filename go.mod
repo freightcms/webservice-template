@@ -10,6 +10,8 @@ require (
 )
 
 require (
+	github.com/freightcms/webservice-template/db v0.0.0-20250525041815-a96e332c1de7 // indirect
+	github.com/freightcms/webservice-template/models v0.0.0-20250525041815-a96e332c1de7 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/graphql-go/graphql v0.8.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
