@@ -1,6 +1,6 @@
 package db
 
-import "github.com/freightcms/webservice-prototype/models"
+import "github.com/freightcms/webservice-template/models"
 
 type PeopleQuery struct {
 	// Page to start sorting by. Indexing at 1

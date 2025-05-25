@@ -21,3 +21,5 @@ require (
 )
 
 replace github.com/freightcms/webservice-template/db => ../db
+
+replace github.com/freightcms/webservice-template/models => ../models

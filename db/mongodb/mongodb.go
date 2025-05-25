@@ -17,8 +17,6 @@ type resourceManager struct {
 
 // Get implements db.PersonResourceManager.
 func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
-	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
-
 	projection := bson.D{}
 
 	// see https://www.mongodb.com/docs/drivers/go/current/fundamentals/crud/read-operations/project/
@@ -43,7 +41,7 @@ func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 		SetSkip(int64((query.Page) * query.PageSize)).
 		SetProjection(projection)
 
-	cursor, err := coll.Find(r.session, bson.D{}, opts)
+	cursor, err := r.collection().Find(r.session, bson.D{}, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +60,7 @@ func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 
 // CreatePerson implements db.PersonResourceManager.
 func (r *resourceManager) CreatePerson(person models.Person) (interface{}, error) {
-	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
-	insertedResult, err := coll.InsertOne(r.session,
+	insertedResult, err := r.collection().InsertOne(r.session,
 		&person,
 		options.InsertOne(),
 	)
@@ -75,8 +72,7 @@ func (r *resourceManager) CreatePerson(person models.Person) (interface{}, error
 
 // DeletePerson implements db.PersonResourceManager.
 func (r *resourceManager) DeletePerson(id interface{}) error {
-	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
-	_, err := coll.DeleteOne(r.session, bson.M{"_id": id})
+	_, err := r.collection().DeleteOne(r.session, bson.M{"_id": id})
 	return err
 }
 
@@ -84,8 +80,7 @@ func (r *resourceManager) DeletePerson(id interface{}) error {
 func (r *resourceManager) GetById(id interface{}) (*models.Person, error) {
 	var result models.Person
 	filter := bson.M{"_id": id}
-	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
-	if err := coll.FindOne(r.session, filter).Decode(&result); err != nil {
+	if err := r.collection().FindOne(r.session, filter).Decode(&result); err != nil {
 		return nil, err
 	}
 	return &result, nil
@@ -93,8 +88,7 @@ func (r *resourceManager) GetById(id interface{}) (*models.Person, error) {
 
 // UpdatePerson implements db.PersonResourceManager.
 func (r *resourceManager) UpdatePerson(id interface{}, person models.Person) error {
-	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
-	result, err := coll.UpdateOne(r.session, bson.M{"_id": id}, person)
+	result, err := r.collection().UpdateOne(r.session, bson.M{"_id": id}, person)
 
 	if result.MatchedCount == 0 {
 		return fmt.Errorf("could not find Person with id %s", id)
