@@ -52,9 +52,9 @@ func main() {
 
 	flag.IntVar(&port, "p", 8080, "Port to run application on")
 	flag.StringVar(&host, "h", "0.0.0.0", "Host address to run application on")
-    flag.StringVar(&dbName "database", "Name of the database to use when connecting")
-    flag.StringVar(&cocollectionName "collection", "Name of the collection in mongodb to use when connecting")
-    ctx := context.Background()
+	flag.StringVar(&dbName, "database", "freightcms", "Name of the database to use when connecting. Defaults to freightcms")
+	flag.StringVar(&collectionName, "collection", "people", "Name of the collection in mongodb to use when connecting. Defaults to 'people'")
+	ctx := context.Background()
 	fmt.Println("Starting application...")
 
 	if err := dotenv.Load(".env"); err != nil {
@@ -76,19 +76,19 @@ func main() {
 		return
 	}
 
-    if dbName == "" {
-        dbName = os.Getenv("DATABASE_NAME")
-        if dbName == "" {
-            log.Fatal("Could not get database name from environment or cli option '--database=...'")
-        }
-    }
+	if dbName == "" {
+		dbName = os.Getenv("DATABASE_NAME")
+		if dbName == "" {
+			log.Fatal("Could not get database name from environment or cli option '--database=...'")
+		}
+	}
 
-    if collectionName == "" {
-        dbName = os.Getenv("COLLECTION_NAME")
-        if dbName == "" {
-            log.Fatal("Could not get collection name from environment or cli option '--collection=...'")
-        }
-    }
+	if collectionName == "" {
+		dbName = os.Getenv("COLLECTION_NAME")
+		if dbName == "" {
+			log.Fatal("Could not get collection name from environment or cli option '--collection=...'")
+		}
+	}
 
 	fmt.Println("Done")
 	fmt.Println("Setting up handlers and routes")
