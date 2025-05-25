@@ -14,7 +14,7 @@ type (
 	// to an HTTP Request
 	GetAllPeopleResponse struct {
 		// Total is the number of results that are in the query
-		Total  int              `json:"total" xml:"total"`
+		Total  int64            `json:"total" xml:"total"`
 		People []*models.Person `json:"people" xml:"people"`
 	}
 )

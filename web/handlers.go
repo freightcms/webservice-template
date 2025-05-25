@@ -13,12 +13,12 @@ func getAllPeopleHandler(c echo.Context) error {
 		return err
 	}
 	q := db.NewQuery().SetPage(r.Page).SetPageSize(r.Limit)
-	people, err := c.(AppContext).PersonResourceManager.Get(q)
+	people, count, err := c.(AppContext).PersonResourceManager.Get(q)
 	if err != nil {
 		return err
 	}
 	res := GetAllPeopleResponse{
-		Total:  -1,
+		Total:  count,
 		People: people,
 	}
 	c.JSON(http.StatusOK, res)

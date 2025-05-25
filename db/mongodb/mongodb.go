@@ -16,7 +16,7 @@ type resourceManager struct {
 }
 
 // Get implements db.PersonResourceManager.
-func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
+func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, int64, error) {
 	projection := bson.D{}
 
 	// see https://www.mongodb.com/docs/drivers/go/current/fundamentals/crud/read-operations/project/
@@ -31,7 +31,7 @@ func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 	}
 	if len(query.SortBy) != 0 {
 		if !slices.Contains([]string{"_id", "id"}, query.SortBy) {
-			return nil, fmt.Errorf("%s is not a valid sortBy option", query.SortBy)
+			return nil, 0, fmt.Errorf("%s is not a valid sortBy option", query.SortBy)
 		}
 	}
 	sort := bson.D{bson.E{Key: query.SortBy, Value: 1}}
@@ -43,7 +43,7 @@ func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 
 	cursor, err := r.collection().Find(r.session, bson.D{}, opts)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	results := []*models.Person{}
 	for cursor.Next(r.session) {
@@ -54,7 +54,16 @@ func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 		}
 		results = append(results, &result)
 	}
-	return results, nil
+
+	countOpts := options.Count().
+		SetLimit(int64(query.PageSize)).
+		SetSkip(int64(query.PageSize) * int64(query.Page))
+	count, err := r.collection().CountDocuments(r.session, bson.D{}, countOpts)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return results, count, nil
 
 }
 

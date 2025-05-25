@@ -68,7 +68,7 @@ type PersonResourceManager interface { // alternatively this can be named to Per
 	// Get fetches all Person resources from target database/resource storage. If none are found an empty slice
 	// is returned. If there is an error fetching one or more recrods the error is immediately returned at the
 	// opperation is cancelled.
-	Get(query *PeopleQuery) ([]*models.Person, error)
+	Get(query *PeopleQuery) ([]*models.Person, int64, error)
 
 	// TODO: add query availability as well so we can search for resources based on properties
 }
