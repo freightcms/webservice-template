@@ -9,12 +9,37 @@ import (
 	"os"
 
 	dotenv "github.com/dotenv-org/godotenvvault"
-	"github.com/graphql-go/handler"
-	"github.com/squishedfox/webservice-prototype/db/mongodb"
-	"github.com/squishedfox/webservice-prototype/web"
+	"github.com/freightcms/webservice-template/db"
+	"github.com/freightcms/webservice-template/db/mongodb"
+	"github.com/freightcms/webservice-template/web"
+	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+// addMongoDbMiddleware adds the CarrierResourceManager to the echo context so that it can be
+// be recovered from the db.DbContext object
+func addMongoDbMiddleware(client *mongo.Client, next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		session, err := client.StartSession()
+		if err != nil {
+			return err
+		}
+		requestContext := c.Request().Context()
+		defer session.EndSession(requestContext)
+
+		sessionContext := mongo.NewSessionContext(requestContext, session)
+		dbContext := db.DbContext{
+			Context:                requestContext,
+			CarrierResourceManager: mongodb.NewCarrierManager(sessionContext),
+		}
+		wrappedContext := web.AppContext{
+			Context:   c,
+			DbContext: dbContext,
+		}
+		return next(wrappedContext)
+	}
+}
 
 var (
 	port int
@@ -22,6 +47,7 @@ var (
 )
 
 func main() {
+
 	flag.IntVar(&port, "p", 8080, "Port to run application on")
 	flag.StringVar(&host, "h", "0.0.0.0", "Host address to run application on")
 	ctx := context.Background()
@@ -49,41 +75,23 @@ func main() {
 	fmt.Println("Done")
 	fmt.Println("Setting up handlers and routes")
 
-	rootSchema, err := web.NewSchema()
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	h := handler.New(&handler.Config{
-		Schema:   &rootSchema,
-		Pretty:   true,
-		GraphiQL: true,
+	server := echo.New()
+	server.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return addMongoDbMiddleware(client, next)
 	})
 
-	server := http.NewServeMux()
-	server.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
-		session, err := client.StartSession()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			w.Header().Set("ContentType", "application/json")
-			return
+	web.Register(server)
+
+	server.GET("/", echo.HandlerFunc(func(c echo.Context) error {
+		body := struct {
+			Status string `json:"status" xml:"status"`
+		}{
+			Status: "Ok",
 		}
-		defer session.EndSession(r.Context())
-
-		sessionContext := mongo.NewSessionContext(r.Context(), session)
-		personManagerContext := mongodb.WithContext(sessionContext)
-		ctx := r.WithContext(personManagerContext)
-		h.ServeHTTP(w, ctx)
-	})
-
-	server.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("{\"status\":\"ok\"}"))
-		w.Header().Set("ContentType", "application/json")
-	})
+		return c.JSONPretty(http.StatusOK, &body, "    ")
+	}))
 	fmt.Println("Done")
 	hostname := fmt.Sprintf("%v:%d", host, port)
-	fmt.Printf("Start server at %s", hostname)
+	fmt.Printf("Start server at %s\n", hostname)
 	http.ListenAndServe(hostname, server)
 }

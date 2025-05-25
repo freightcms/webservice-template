@@ -1,23 +1,14 @@
 package mongodb
 
 import (
-	"context"
-	"errors"
 	"fmt"
 	"slices"
 
-	"github.com/squishedfox/webservice-prototype/db"
-	"github.com/squishedfox/webservice-prototype/models"
+	"github.com/freightcms/webservice-template/db"
+	"github.com/freightcms/webservice-template/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-)
-
-type PersonResourceManagerContextKey string
-
-const (
-	// ContextKey used to fetch or put the Person Resource Manager into the context
-	ContextKey PersonResourceManagerContextKey = "personResourceManagerContextKey"
 )
 
 type resourceManager struct {
@@ -69,26 +60,6 @@ func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 
 }
 
-// WithContext fetches the mongo db session context from that passed argument (parent context)
-// ,appends the person manager and returns all with the new context.
-func WithContext(session mongo.SessionContext) context.Context {
-	if session == nil {
-		panic("Could not fetch session from context")
-	}
-	mgr := NewPersonManager(session)
-	return context.WithValue(session, ContextKey, mgr)
-}
-
-// FromContext gets the Resource Manager from the context passsed.
-func FromContext(ctx context.Context) db.PersonResourceManager {
-	val := ctx.Value(ContextKey)
-	if val == nil {
-		panic(errors.New("could not fetch PersonResourceManager from context"))
-	}
-
-	return val.(*resourceManager)
-}
-
 // CreatePerson implements db.PersonResourceManager.
 func (r *resourceManager) CreatePerson(person models.Person) (interface{}, error) {
 	coll := r.session.Client().Database("graphql_mongo_prototype").Collection("people")
@@ -133,4 +104,9 @@ func (r *resourceManager) UpdatePerson(id interface{}, person models.Person) err
 
 func NewPersonManager(session mongo.SessionContext) db.PersonResourceManager {
 	return &resourceManager{session: session}
+}
+
+func (r *resourceManager) collection() *mongo.Collection {
+	coll := r.session.Client().Database("freightcms").Collection("people")
+	return coll
 }

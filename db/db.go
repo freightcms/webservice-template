@@ -1,6 +1,6 @@
 package db
 
-import "github.com/squishedfox/webservice-prototype/models"
+import "github.com/freightcms/webservice-prototype/models"
 
 type PeopleQuery struct {
 	// Page to start sorting by. Indexing at 1
