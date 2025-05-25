@@ -1,0 +1,3 @@
+MONGO_SERVER=mongodb://root:example@0.0.0.0:27017/
+DATABASE_NAME=freightcms
+COLLECTION_NAME=people

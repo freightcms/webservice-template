@@ -12,7 +12,9 @@ import (
 )
 
 type resourceManager struct {
-	session mongo.SessionContext
+	collectionName string
+	dbName         string
+	session        mongo.SessionContext
 }
 
 // Get implements db.PersonResourceManager.
@@ -105,8 +107,12 @@ func (r *resourceManager) UpdatePerson(id any, person models.Person) error {
 	return err
 }
 
-func NewPersonManager(session mongo.SessionContext) db.PersonResourceManager {
-	return &resourceManager{session: session}
+func NewPersonManager(dbName, collectionName string, session mongo.SessionContext) db.PersonResourceManager {
+	return &resourceManager{
+		dbName:         dbName,
+		collectionName: collectionName,
+		session:        session,
+	}
 }
 
 func (r *resourceManager) collection() *mongo.Collection {
