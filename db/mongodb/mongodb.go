@@ -59,7 +59,7 @@ func (r *resourceManager) Get(query *db.PeopleQuery) ([]*models.Person, error) {
 }
 
 // CreatePerson implements db.PersonResourceManager.
-func (r *resourceManager) CreatePerson(person models.Person) (interface{}, error) {
+func (r *resourceManager) CreatePerson(person models.Person) (any, error) {
 	insertedResult, err := r.collection().InsertOne(r.session,
 		&person,
 		options.InsertOne(),
@@ -71,13 +71,13 @@ func (r *resourceManager) CreatePerson(person models.Person) (interface{}, error
 }
 
 // DeletePerson implements db.PersonResourceManager.
-func (r *resourceManager) DeletePerson(id interface{}) error {
+func (r *resourceManager) DeletePerson(id any) error {
 	_, err := r.collection().DeleteOne(r.session, bson.M{"_id": id})
 	return err
 }
 
 // GetById implements db.PersonResourceManager.
-func (r *resourceManager) GetById(id interface{}) (*models.Person, error) {
+func (r *resourceManager) GetById(id any) (*models.Person, error) {
 	var result models.Person
 	filter := bson.M{"_id": id}
 	if err := r.collection().FindOne(r.session, filter).Decode(&result); err != nil {
@@ -87,7 +87,7 @@ func (r *resourceManager) GetById(id interface{}) (*models.Person, error) {
 }
 
 // UpdatePerson implements db.PersonResourceManager.
-func (r *resourceManager) UpdatePerson(id interface{}, person models.Person) error {
+func (r *resourceManager) UpdatePerson(id any, person models.Person) error {
 	result, err := r.collection().UpdateOne(r.session, bson.M{"_id": id}, person)
 
 	if result.MatchedCount == 0 {
