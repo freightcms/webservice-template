@@ -100,14 +100,6 @@ func main() {
 
 	web.Register(server)
 
-	server.GET("/", echo.HandlerFunc(func(c echo.Context) error {
-		body := struct {
-			Status string `json:"status" xml:"status"`
-		}{
-			Status: "Ok",
-		}
-		return c.JSONPretty(http.StatusOK, &body, "    ")
-	}))
 	fmt.Println("Done")
 	hostname := fmt.Sprintf("%v:%d", host, port)
 	fmt.Printf("Start server at %s\n", hostname)
