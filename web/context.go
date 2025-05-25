@@ -8,6 +8,6 @@ import (
 type (
 	AppContext struct {
 		echo.Context
-		db.Context
+		db.DbContext
 	}
 )
