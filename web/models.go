@@ -1,6 +1,6 @@
 package web
 
-import "github.com/freightcms/webservice-prototype/models"
+import "github.com/freightcms/webservice-template/models"
 
 type (
 	GetAllPeopleRequest struct {
