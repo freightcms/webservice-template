@@ -4,19 +4,18 @@ go 1.24.3
 
 require (
 	github.com/dotenv-org/godotenvvault v0.6.0
-	github.com/graphql-go/handler v0.2.4
-	github.com/squishedfox/webservice-prototype v0.0.0-20250312022857-082b54356419
+	github.com/freightcms/webservice-template/db v0.0.0-20250525125139-f0c7683d674e
+	github.com/freightcms/webservice-template/db/mongodb v0.0.0-00010101000000-000000000000
+	github.com/freightcms/webservice-template/web v0.0.0-00010101000000-000000000000
+	github.com/labstack/echo/v4 v4.13.4
 	go.mongodb.org/mongo-driver v1.17.3
 )
 
 require (
-	github.com/freightcms/webservice-template/db v0.0.0-20250525041815-a96e332c1de7 // indirect
 	github.com/freightcms/webservice-template/models v0.0.0-20250525041815-a96e332c1de7 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/graphql-go/graphql v0.8.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
-	github.com/labstack/echo/v4 v4.13.4 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
