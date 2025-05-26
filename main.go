@@ -98,11 +98,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db, err := client.Database("freightcms")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	session.EndSession(context.Background())
 
 	fmt.Println("Setting up handlers and routes")
