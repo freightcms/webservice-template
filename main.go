@@ -154,7 +154,7 @@ func main() {
 	server.Use(loggingMiddlewre)
 	server.Use(addMongoDbMiddleware)
 
-	web.Register(server)
+	web.Router(server)
 
 	logger.Debug("Done")
 	hostname := fmt.Sprintf("%v:%d", host, port)
