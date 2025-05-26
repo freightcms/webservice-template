@@ -15,6 +15,7 @@ import (
 	"github.com/freightcms/webservice-template/db/mongodb"
 	"github.com/freightcms/webservice-template/web"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -55,7 +56,7 @@ func loggingMiddlewre(next echo.HandlerFunc) echo.HandlerFunc {
 			headers[k] = v
 		}
 		logObj := struct {
-			Body    string
+			Body    string              `json:"body"`
 			Headers map[string][]string `json:"headers"`
 			Method  string              `json:"method"`
 			Url     string              `json:"url"`
@@ -85,6 +86,7 @@ var (
 	host           string
 	dbName         string
 	collectionName string
+	allowedHosts   string
 	logger         = logging.New(os.Stdout, logging.LogLevels())
 )
 
@@ -94,6 +96,7 @@ func main() {
 	flag.StringVar(&host, "h", "0.0.0.0", "Host address to run application on")
 	flag.StringVar(&dbName, "database", "freightcms", "Name of the database to use when connecting. Defaults to freightcms")
 	flag.StringVar(&collectionName, "collection", "people", "Name of the collection in mongodb to use when connecting. Defaults to 'people'")
+	flag.StringVar(&allowedHosts, "allowedHosts", "localhost:8080", "Comma seperated list of hostnames that are allowed to communicate with service")
 
 	ctx := context.Background()
 
@@ -116,6 +119,9 @@ func main() {
 			log.Fatal("Could not get collection name from environment or cli option '--collection=...'")
 		}
 	}
+	if len(allowedHosts) == 0 {
+		logger.Warning("Starting application with no Allowed Hosts")
+	}
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(os.Getenv("MONGO_SERVER")).SetServerAPIOptions(serverAPI)
@@ -132,8 +138,8 @@ func main() {
 		return
 	}
 
-	fmt.Println("Done")
-	fmt.Println("Checked for database setup")
+	logger.Debug("Done")
+	logger.Debug("Checked for database setup")
 
 	session, err := client.StartSession()
 	if err != nil {
@@ -142,7 +148,7 @@ func main() {
 
 	session.EndSession(context.Background())
 
-	fmt.Println("Setting up handlers and routes")
+	logger.Debug("Setting up handlers and routes")
 
 	server := echo.New()
 	server.Use(loggingMiddlewre)
@@ -152,8 +158,9 @@ func main() {
 
 	web.Register(server)
 
-	fmt.Println("Done")
+	logger.Debug("Done")
 	hostname := fmt.Sprintf("%v:%d", host, port)
-	fmt.Printf("Start server at %s\n", hostname)
+	logger.Debug("Start server at %s\n", hostname)
+
 	http.ListenAndServe(hostname, server)
 }
