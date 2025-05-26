@@ -22,6 +22,8 @@ use (
 
 ```dotenv
 MONGO_SERVER=mongodb://root:example@0.0.0.0:27017/
+DATABASE_NAME=freightcms
+COLLECTION_NAME=people
 ```
 
 ## Running
@@ -56,3 +58,9 @@ should output
 ```sh
 { "status": "ok" }
 ```
+
+## See Also
+
+- [Mongo Express](https://github.com/mongo-express/mongo-express)
+- [MongoDB Go Driver](https://www.mongodb.com/docs/drivers/go/current/)
+- [Echo](https://echo.labstack.com/)
