@@ -30,8 +30,8 @@ func addMongoDbMiddleware(client *mongo.Client, next echo.HandlerFunc) echo.Hand
 
 		sessionContext := mongo.NewSessionContext(requestContext, session)
 		dbContext := db.DbContext{
-			Context:                requestContext,
-			CarrierResourceManager: mongodb.NewCarrierManager(sessionContext),
+			Context:               requestContext,
+			PersonResourceManager: mongodb.NewPersonManager(dbName, collectionName, sessionContext),
 		}
 		wrappedContext := web.AppContext{
 			Context:   c,
@@ -91,6 +91,20 @@ func main() {
 	}
 
 	fmt.Println("Done")
+
+	fmt.Println("Checked for database setup")
+	session, err := client.StartSession()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db, err := client.Database("freightcms")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	session.EndSession(context.Background())
+
 	fmt.Println("Setting up handlers and routes")
 
 	server := echo.New()
