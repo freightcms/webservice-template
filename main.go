@@ -15,9 +15,17 @@ import (
 	"github.com/freightcms/webservice-template/db/mongodb"
 	"github.com/freightcms/webservice-template/web"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+var (
+	port           int
+	host           string
+	dbName         string
+	collectionName string
+	allowedHosts   string
+	logger         = logging.New(os.Stdout, logging.LogLevels())
 )
 
 // addMongoDbMiddleware adds the CarrierResourceManager to the echo context so that it can be
@@ -81,15 +89,6 @@ func loggingMiddlewre(next echo.HandlerFunc) echo.HandlerFunc {
 	})
 }
 
-var (
-	port           int
-	host           string
-	dbName         string
-	collectionName string
-	allowedHosts   string
-	logger         = logging.New(os.Stdout, logging.LogLevels())
-)
-
 func main() {
 
 	flag.IntVar(&port, "p", 8080, "Port to run application on")
@@ -100,7 +99,7 @@ func main() {
 
 	ctx := context.Background()
 
-	fmt.Println("Starting application...")
+	logger.Debug("Starting application...")
 
 	if err := dotenv.Load(".env"); err != nil {
 		log.Fatal(err)
@@ -132,7 +131,7 @@ func main() {
 	}
 
 	defer client.Disconnect(ctx)
-	fmt.Println("Pinging server...")
+	logger.Debug("Pinging server...")
 	if err = client.Ping(ctx, nil); err != nil {
 		log.Fatal(err)
 		return
