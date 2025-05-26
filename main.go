@@ -26,12 +26,13 @@ var (
 	collectionName string
 	allowedHosts   string
 	logger         = logging.New(os.Stdout, logging.LogLevels())
+	client         *mongo.Client
 )
 
 // addMongoDbMiddleware adds the CarrierResourceManager to the echo context so that it can be
 // be recovered from the db.DbContext object
-func addMongoDbMiddleware(client *mongo.Client, next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+func addMongoDbMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return echo.HandlerFunc(func(c echo.Context) error {
 		session, err := client.StartSession()
 		if err != nil {
 			return err
@@ -49,7 +50,7 @@ func addMongoDbMiddleware(client *mongo.Client, next echo.HandlerFunc) echo.Hand
 			DbContext: dbContext,
 		}
 		return next(wrappedContext)
-	}
+	})
 }
 
 func loggingMiddlewre(next echo.HandlerFunc) echo.HandlerFunc {
@@ -151,9 +152,7 @@ func main() {
 
 	server := echo.New()
 	server.Use(loggingMiddlewre)
-	server.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return addMongoDbMiddleware(client, next)
-	})
+	server.Use(addMongoDbMiddleware)
 
 	web.Register(server)
 
