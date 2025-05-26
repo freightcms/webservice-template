@@ -139,15 +139,6 @@ func main() {
 	}
 
 	logger.Debug("Done")
-	logger.Debug("Checked for database setup")
-
-	session, err := client.StartSession()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	session.EndSession(context.Background())
-
 	logger.Debug("Setting up handlers and routes")
 
 	server := echo.New()
