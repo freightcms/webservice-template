@@ -2,6 +2,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dotenv-org/godotenvvault v0.6.0 h1:e6rUPELZaPmf6SgxxdB3nACG9VQAE8+omrSSZm0QUgk=
 github.com/dotenv-org/godotenvvault v0.6.0/go.mod h1:q/635WfmO04uUBVwrDWchRPOvPWaplWC6Udm+illcS4=
+github.com/freightcms/logging v0.0.0-20241025015227-1c8114cb08fc h1:JZYAlFKgq74Pd4Z6H1G0VgxoewzxLcHr+4sgur1PwaA=
+github.com/freightcms/logging v0.0.0-20241025015227-1c8114cb08fc/go.mod h1:/wWD8igjZneCUsBmTw9udjGx5QMOzXD3qeBF0G+awRk=
 github.com/golang/snappy v0.0.4 h1:yAGX7huGHXlcLOEtBnF4w7FQwA26wojNCwOYAEhLjQM=
 github.com/golang/snappy v0.0.4/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=

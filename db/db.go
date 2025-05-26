@@ -30,6 +30,9 @@ func (q *PeopleQuery) SetPage(page int) *PeopleQuery {
 }
 
 func (q *PeopleQuery) SetPageSize(pageSize int) *PeopleQuery {
+	if pageSize <= 0 {
+		return q
+	}
 	q.PageSize = pageSize
 	return q
 }

@@ -4,6 +4,7 @@ go 1.24.3
 
 require (
 	github.com/dotenv-org/godotenvvault v0.6.0
+	github.com/freightcms/logging v0.0.0-20241025015227-1c8114cb08fc
 	github.com/freightcms/webservice-template/db v0.0.0-20250525125139-f0c7683d674e
 	github.com/freightcms/webservice-template/db/mongodb v0.0.0-00010101000000-000000000000
 	github.com/freightcms/webservice-template/web v0.0.0-00010101000000-000000000000

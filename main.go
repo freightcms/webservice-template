@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"os"
 
 	dotenv "github.com/dotenv-org/godotenvvault"
+	"github.com/freightcms/logging"
 	"github.com/freightcms/webservice-template/db"
 	"github.com/freightcms/webservice-template/db/mongodb"
 	"github.com/freightcms/webservice-template/web"
@@ -41,11 +43,49 @@ func addMongoDbMiddleware(client *mongo.Client, next echo.HandlerFunc) echo.Hand
 	}
 }
 
+func loggingMiddlewre(next echo.HandlerFunc) echo.HandlerFunc {
+	return echo.HandlerFunc(func(c echo.Context) error {
+		req := c.Request()
+
+		headers := make(map[string][]string)
+		for k, v := range req.Header {
+			if k == "authorization" {
+				continue // don't include this header for security reasons
+			}
+			headers[k] = v
+		}
+		logObj := struct {
+			Body    string
+			Headers map[string][]string `json:"headers"`
+			Method  string              `json:"method"`
+			Url     string              `json:"url"`
+		}{
+			Headers: headers,
+			Method:  req.Method,
+			Url:     req.URL.String(),
+		}
+
+		logObjJson, _ := json.Marshal(logObj)
+		if len(logObjJson) != 0 {
+			logger.Debug(string(logObjJson))
+		}
+		err := next(c)
+		if err != nil {
+			jsonError, _ := json.Marshal(err)
+			if len(jsonError) != 0 {
+				logger.Error(string(jsonError))
+			}
+		}
+		return err
+	})
+}
+
 var (
 	port           int
 	host           string
 	dbName         string
 	collectionName string
+	logger         = logging.New(os.Stdout, logging.LogLevels())
 )
 
 func main() {
@@ -54,7 +94,9 @@ func main() {
 	flag.StringVar(&host, "h", "0.0.0.0", "Host address to run application on")
 	flag.StringVar(&dbName, "database", "freightcms", "Name of the database to use when connecting. Defaults to freightcms")
 	flag.StringVar(&collectionName, "collection", "people", "Name of the collection in mongodb to use when connecting. Defaults to 'people'")
+
 	ctx := context.Background()
+
 	fmt.Println("Starting application...")
 
 	if err := dotenv.Load(".env"); err != nil {
@@ -103,6 +145,7 @@ func main() {
 	fmt.Println("Setting up handlers and routes")
 
 	server := echo.New()
+	server.Use(loggingMiddlewre)
 	server.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return addMongoDbMiddleware(client, next)
 	})
