@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	dotenv "github.com/dotenv-org/godotenvvault"
 	"github.com/freightcms/logging"
@@ -15,6 +16,7 @@ import (
 	"github.com/freightcms/webservice-template/db/mongodb"
 	"github.com/freightcms/webservice-template/web"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -90,6 +92,18 @@ func loggingMiddlewre(next echo.HandlerFunc) echo.HandlerFunc {
 	})
 }
 
+// getAllowedOrigins parses the`allowedHosts` global variable in a sane list of strings by trimming the strings and spliting on the "," character
+func getAllowedOrigins() []string {
+	s := strings.Split(allowedHosts, ",")
+	origins := make([]string, len(s))
+
+	for _, v := range s {
+		origins = append(origins, strings.Trim(v, " "))
+	}
+
+	return origins
+}
+
 func main() {
 
 	flag.IntVar(&port, "p", 8080, "Port to run application on")
@@ -144,6 +158,16 @@ func main() {
 	server := echo.New()
 	server.Use(loggingMiddlewre)
 	server.Use(addMongoDbMiddleware)
+	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: getAllowedOrigins(),
+		AllowMethods: []string{
+			http.MethodGet,
+			http.MethodDelete,
+			http.MethodOptions,
+			http.MethodPost,
+			http.MethodPut,
+		},
+	}))
 
 	web.Router(server)
 
