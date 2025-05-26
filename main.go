@@ -156,8 +156,8 @@ func main() {
 	logger.Debug("Setting up handlers and routes")
 
 	server := echo.New()
-	server.Use(loggingMiddlewre)
-	server.Use(addMongoDbMiddleware)
+	server.Use(middleware.Secure())
+	server.Use(middleware.CSRF())
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: getAllowedOrigins(),
 		AllowMethods: []string{
@@ -168,6 +168,9 @@ func main() {
 			http.MethodPut,
 		},
 	}))
+
+	server.Use(loggingMiddlewre)
+	server.Use(addMongoDbMiddleware)
 
 	web.Router(server)
 
