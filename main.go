@@ -103,6 +103,20 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+	if dbName == "" {
+		dbName = os.Getenv("DATABASE_NAME")
+		if dbName == "" {
+			log.Fatal("Could not get database name from environment or cli option '--database=...'")
+		}
+	}
+
+	if collectionName == "" {
+		dbName = os.Getenv("COLLECTION_NAME")
+		if dbName == "" {
+			log.Fatal("Could not get collection name from environment or cli option '--collection=...'")
+		}
+	}
+
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(os.Getenv("MONGO_SERVER")).SetServerAPIOptions(serverAPI)
 	client, err := mongo.Connect(ctx, opts)
@@ -118,23 +132,9 @@ func main() {
 		return
 	}
 
-	if dbName == "" {
-		dbName = os.Getenv("DATABASE_NAME")
-		if dbName == "" {
-			log.Fatal("Could not get database name from environment or cli option '--database=...'")
-		}
-	}
-
-	if collectionName == "" {
-		dbName = os.Getenv("COLLECTION_NAME")
-		if dbName == "" {
-			log.Fatal("Could not get collection name from environment or cli option '--collection=...'")
-		}
-	}
-
 	fmt.Println("Done")
-
 	fmt.Println("Checked for database setup")
+
 	session, err := client.StartSession()
 	if err != nil {
 		log.Fatal(err)
