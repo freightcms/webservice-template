@@ -10,11 +10,11 @@ import (
 	"os"
 	"strings"
 
-	dotenv "github.com/dotenv-org/godotenvvault"
 	"github.com/freightcms/logging"
 	"github.com/freightcms/webservice-template/db"
 	"github.com/freightcms/webservice-template/db/mongodb"
 	"github.com/freightcms/webservice-template/web"
+	dotenv "github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
