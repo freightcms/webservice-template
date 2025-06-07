@@ -117,8 +117,7 @@ func main() {
 	logger.Debug("Starting application...")
 
 	if err := dotenv.Load(".env"); err != nil {
-		log.Fatal(err)
-		return
+		logger.Warning("If you are running a production build ignore this message. No \".env\" file found. ")
 	}
 	if dbName == "" {
 		dbName = os.Getenv("DATABASE_NAME")
